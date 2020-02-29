@@ -9,6 +9,7 @@ public class ComConverter
 {
     static bool _continue = true;
     static bool _echoMode = false;
+    static bool _binaryMode = false;
     static SerialPort _readSerialPort;
     static SerialPort _writeSerialPort;
 
@@ -59,9 +60,6 @@ public class ComConverter
 
         Thread readThread = new Thread(Read);
 
-        _continue = true;
-        _echoMode = false;
-
         readThread.Start();
 
         while (_continue)
@@ -81,6 +79,16 @@ public class ComConverter
             {
                 _echoMode = false;
                 Console.WriteLine(">>> echo mode off");
+            }
+            else if (message.ToLower() == "binary on")
+            {
+                _binaryMode = true;
+                Console.WriteLine(">>> binary mode on");
+            }
+            else if (message.ToLower() == "binary off")
+            {
+                _binaryMode = false;
+                Console.WriteLine(">>> binary mode off");
             }
             else if (message.ToLower() == "show")
             {
@@ -108,14 +116,14 @@ public class ComConverter
     public static void DisplayCommand()
     {
         Console.WriteLine("");
-        Console.WriteLine("+-------------------------------------------+");
-        Console.WriteLine("|  quit      : to exit ComConverter         |");
-        Console.WriteLine("|  echo on   : to turn on echo mode         |");
-        Console.WriteLine("|  echo off  : to turn off echo mode        |");
-        Console.WriteLine("|  show      : to show the current setting  |");
-        Console.WriteLine("|  send      : to send message              |");
-        Console.WriteLine("|  ? or help : to show this screen          |");
-        Console.WriteLine("+-------------------------------------------+");
+        Console.WriteLine("+-----------------------------------------------+");
+        Console.WriteLine("|  quit          : to exit ComConverter         |");
+        Console.WriteLine("|  echo on/off   : to turn on/off echo mode     |");
+        Console.WriteLine("|  binary on/off : to turn on/off binary mode   |");
+        Console.WriteLine("|  show          : to show the current setting  |");
+        Console.WriteLine("|  send          : to send message              |");
+        Console.WriteLine("|  ? or help     : to show this screen          |");
+        Console.WriteLine("+-----------------------------------------------+");
         Console.WriteLine("");
     }
 
@@ -185,6 +193,7 @@ public class ComConverter
 
         Console.WriteLine("");
         Console.WriteLine("== Echo Mode : {0} ==", _echoMode ? "on" : "off");
+        Console.WriteLine("== Binary Mode : {0} ==", _binaryMode ? "on" : "off");
         Console.WriteLine("");
     }
 
