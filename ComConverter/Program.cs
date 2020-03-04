@@ -62,6 +62,9 @@ public class ComConverter
 
         readThread.Start();
 
+        byte[] buffer = new byte[256];
+        int nBuffer = 0;
+
         while (_continue)
         {
             string message = Console.ReadLine();
@@ -100,11 +103,25 @@ public class ComConverter
             }
             else if (message.ToLower() == "send")
             {
-                Console.Write("message: ");
+                Console.Write("message (hexa code): ");
+
                 string s = Console.ReadLine();
-                _writeSerialPort.WriteLine(s);
-                if (_echoMode)
-                    Console.WriteLine("WRITE>>> " + s);
+                if (s != null && s.Length > 0)
+                {
+                    nBuffer = 0;
+
+                    string[] tok = s.Split(' ');
+                    foreach (string t in tok)
+                    {
+                        buffer[nBuffer++] = Convert.ToByte(Convert.ToInt32(t, 16));
+                    }
+
+                    if (nBuffer > 0)
+                        _writeSerialPort.Write(buffer, 0, nBuffer);
+                    //_writeSerialPort.WriteLine(s);
+                    //if (_echoMode)
+                    //    Console.WriteLine("WRITE>>> " + s);
+                }
             }
         }
 
@@ -119,7 +136,7 @@ public class ComConverter
         Console.WriteLine("+-----------------------------------------------+");
         Console.WriteLine("|  quit          : to exit ComConverter         |");
         Console.WriteLine("|  echo on/off   : to turn on/off echo mode     |");
-        Console.WriteLine("|  binary on/off : to turn on/off binary mode   |");
+        //Console.WriteLine("|  binary on/off : to turn on/off binary mode   |");
         Console.WriteLine("|  show          : to show the current setting  |");
         Console.WriteLine("|  send          : to send message              |");
         Console.WriteLine("|  ? or help     : to show this screen          |");
@@ -293,13 +310,27 @@ public class ComConverter
 
     public static void Read()
     {
+        byte[] buffer = new byte[256];
+        int nBuffer = 0;
+
         while (_continue)
         {
             try
             {
-                string message = _readSerialPort.ReadLine();
-                if (_echoMode)
-                    Console.WriteLine("READ>>> " + message);
+                nBuffer = _readSerialPort.Read(buffer, 0, 256);
+                if (nBuffer > 0)
+                {
+                    if (_echoMode)
+                    {
+                        Console.Write("READ>>> ");
+                        for (int i = 0; i < nBuffer; ++i)
+                        {
+                            Console.Write("0x" + buffer[i].ToString("X2") + " ");
+                        }
+                        Console.WriteLine("");
+                    }
+
+                }
             }
             catch (TimeoutException) { }
         }
